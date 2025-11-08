@@ -1,53 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginScreen from './screens/LoginScreen';
-import MainAppScreen from './MainAppScreen';
+import MainAppScreen from './screens/MainAppScreen';
+// import { AppProvider } from './context/AppContext'; // Opcional, si quieres usar Context
 
-// Datos de usuario simulados para la demostración
-const MOCK_USER = {
-    name: 'Javier Pérez',
-    email: 'javier@workly.com',
-    age: 30,
-    preferences: 'Programación, Diseño UX/UI, Remoto, Freelance'
-};
+function App() {
+  // Simula el estado de autenticación y datos del usuario
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-const App = () => {
-    // Inicializar el usuario a null para forzar el login al inicio
-    const [user, setUser] = useState(null); 
+  // Simulación de verificación de sesión (puedes reemplazar con lógica real de tokens)
+  useEffect(() => {
+    // Aquí iría la verificación de token o sesión
+    setTimeout(() => {
+      // Si hay un token válido, cargar datos del usuario.
+      // Por ahora, asumimos que no hay sesión al iniciar.
+      setIsLoading(false);
+    }, 500);
+  }, []);
 
-    const handleLogin = (email, password) => {
-        // Simulación de login exitoso
-        if (email === MOCK_USER.email.toLowerCase() || email === "test@test.com") {
-            setUser(MOCK_USER);
-            return true; // Éxito
-        }
-        return false;
-    };
+  const handleLogin = (userData) => {
+    setCurrentUser(userData);
+  };
 
-    const handleLogout = () => {
-        setUser(null);
-    };
+  const handleLogout = () => {
+    // Lógica para limpiar la sesión/token
+    setCurrentUser(null);
+  };
 
-    const handleUpdateUser = (newUserData) => {
-        setUser(prevUser => ({
-            ...prevUser,
-            ...newUserData
-        }));
-    };
-
-    // Si no hay usuario, mostrar la pantalla de Login
-    if (!user) {
-        // Pasar la función de Registro como un simple console.log o una función de navegación si existe
-        return <LoginScreen onLogin={handleLogin} onRegisterClick={() => console.log('Navegar a Registro')} />;
-    }
-
-    // Si hay usuario, mostrar la aplicación principal
+  if (isLoading) {
+    // Pantalla de carga simple
     return (
-        <MainAppScreen 
-            user={user} 
-            onLogout={handleLogout} 
-            onUpdateUser={handleUpdateUser} // Pasamos la función de actualización
-        />
+        <div className="min-h-screen flex items-center justify-center bg-[#17202A] text-white">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1ABC9C] mr-3"></div>
+            <p className="text-xl">Cargando Workly...</p>
+        </div>
     );
-};
+  }
+
+  return (
+    // <AppProvider> // Descomenta si usas el contexto
+      <div className="App">
+        {currentUser ? (
+          <MainAppScreen user={currentUser} onLogout={handleLogout} />
+        ) : (
+          <LoginScreen onLogin={handleLogin} />
+        )}
+      </div>
+    // </AppProvider>
+  );
+}
 
 export default App;
